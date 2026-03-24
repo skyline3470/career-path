@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Career Quiz{% endblock %}
+
+{% block content %}
+<div class="container">
+  <span class="badge">2 Questions</span>
+  <h1>Career Quiz</h1>
+  <p style="color:var(--muted);margin-top:.5rem">Answer honestly — there's no wrong choice!</p>
+
+  <div class="quiz-box">
+    <form method="POST">
+      <!-- Question 1 -->
+      <span class="q-label">1. Which subject do you enjoy most?</span>
+      <div class="options">
+        <label><input type="radio" name="subject" value="math" required> ➕ Math</label>
+        <label><input type="radio" name="subject" value="biology"> 🧬 Biology</label>
+        <label><input type="radio" name="subject" value="business"> 💰 Business</label>
+        <label><input type="radio" name="subject" value="computers"> 💻 Computers</label>
+      </div>
+
+      <!-- Question 2 -->
+      <span class="q-label">2. What type of work do you prefer?</span>
+      <div class="options">
+        <label><input type="radio" name="work" value="solving" required> 🔧 Problem Solving</label>
+        <label><input type="radio" name="work" value="helping"> 🤝 Helping People</label>
+        <label><input type="radio" name="work" value="managing"> 📋 Managing</label>
+        <label><input type="radio" name="work" value="designing"> 🎨 Designing</label>
+      </div>
+
+      <button type="submit" class="btn" style="width:100%">See My Result →</button>
+    </form>
+
+    <!-- Result (only shown after POST) -->
+    {% if result %}
+    <div class="result-box" id="result">
+      <span class="big-emoji">{{ result.emoji }}</span>
+      <h3>{{ result.title }}</h3>
+      <p>{{ result.desc }}</p>
+      <a href="/career/{{ result.slug }}" class="btn">Explore This Career</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

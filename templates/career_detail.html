@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ career.title }} — Career Path{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="detail-hero">
+    <span class="big-emoji">{{ career.emoji }}</span>
+    <h1>{{ career.title }}</h1>
+    <p style="color:var(--muted);margin-top:.5rem;font-size:1.1rem">{{ career.desc }}</p>
+    <div class="pills">
+      {% for s in career.skills %}
+      <span class="pill">{{ s }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-box">
+      <h3>📚 Subjects Needed</h3>
+      <div class="pills">
+        {% for sub in career.subjects %}
+        <span class="pill pink">{{ sub }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="info-box">
+      <h3>💼 Example Roles & Companies</h3>
+      <div class="pills">
+        {% for r in career.roles %}
+        <span class="pill">{{ r }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;">
+    <a href="/careers" class="btn btn-outline">← All Careers</a>
+    <a href="/form?career={{ career.title }}" class="btn">Save This Career</a>
+  </div>
+</div>
+{% endblock %}

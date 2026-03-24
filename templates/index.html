@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Career Path Explorer — Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <span class="badge">🎓 For Students</span>
+  <h1>Discover Your<br>Dream Career</h1>
+  <p>Not sure what to do after school? Explore careers, take our quick quiz, and find the path that fits YOU.</p>
+  <a href="/careers" class="btn">Start Exploring →</a>
+  &nbsp;
+  <a href="/quiz" class="btn btn-outline">Take the Quiz</a>
+</section>
+
+<div class="container">
+  <h2>How it works</h2>
+  <div class="grid" style="margin-top:1.5rem">
+    <div class="card">
+      <span class="emoji">🗺️</span>
+      <h3>Browse Careers</h3>
+      <p>Explore 6 major career fields with descriptions, skills, and top companies.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">🧠</span>
+      <h3>Take the Quiz</h3>
+      <p>Answer 2 quick questions and get a personalised career recommendation instantly.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📝</span>
+      <h3>Register Interest</h3>
+      <p>Save your preferred career and get added to our student database.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

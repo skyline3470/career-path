@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Register Interest{% endblock %}
+
+{% block content %}
+<div class="container">
+  <span class="badge">📝 Enroll</span>
+  <h1>Save Your Career</h1>
+  <p style="color:var(--muted);margin-top:.5rem">Fill in the form below — we'll store your preference.</p>
+
+  <div class="form-box">
+    {% if success %}
+    <div class="success-msg">✅ Saved successfully! Check the Admin page to see your entry.</div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" name="name" placeholder="e.g. Arjun Sharma" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="arjun@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Preferred Career</label>
+        <select name="career" required>
+          <option value="">— Select a career —</option>
+          {% for slug, c in careers.items() %}
+          <option value="{{ c.title }}"
+            {% if request.args.get('career') == c.title %}selected{% endif %}>
+            {{ c.emoji }} {{ c.title }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn" style="width:100%">Submit →</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

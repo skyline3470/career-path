@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Explore Careers{% endblock %}
+
+{% block content %}
+<div class="container">
+  <span class="badge">All Paths</span>
+  <h1>Career Categories</h1>
+  <p style="color:var(--muted);margin-top:.5rem">Click any card to learn more about that field.</p>
+
+  <div class="grid">
+    {% for slug, c in careers.items() %}
+    <a href="/career/{{ slug }}" class="card">
+      <span class="emoji">{{ c.emoji }}</span>
+      <h3>{{ c.title }}</h3>
+      <p>{{ c.desc[:80] }}…</p>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
