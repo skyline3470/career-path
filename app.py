@@ -21,6 +21,7 @@ app = Flask(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 SQLITE_DB = os.getenv("SQLITE_DB_PATH", "database.db")
 USE_POSTGRES = DATABASE_URL.startswith(("postgresql://", "postgres://"))
+DB_INITIALIZED = False
 
 
 def get_connection():
@@ -56,6 +57,15 @@ def init_db():
     conn.execute(create_table_sql)
     conn.commit()
     conn.close()
+
+
+def ensure_db_initialized():
+    """Initialize the database once per server instance."""
+    global DB_INITIALIZED
+    if DB_INITIALIZED:
+        return
+    init_db()
+    DB_INITIALIZED = True
 
 # Career data — easy to extend
 CAREERS = {
@@ -130,6 +140,10 @@ QUIZ_MAP = {
 }
 
 # ---- Routes ----
+
+@app.before_request
+def setup_database():
+    ensure_db_initialized()
 
 @app.route("/")
 def home():
@@ -206,5 +220,5 @@ def health():
 
 # ---- Start ----
 if __name__ == "__main__":
-    init_db()          # create DB on first run
+    ensure_db_initialized()
     app.run(debug=True)
