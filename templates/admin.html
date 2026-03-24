@@ -6,6 +6,9 @@
   <span class="badge">🔒 Admin</span>
   <h1>Student Submissions</h1>
   <p style="color:var(--muted);margin-top:.5rem">{{ students|length }} record(s) in the database.</p>
+  {% if error %}
+  <p style="color:#8a1c1c;margin-top:.75rem">Database error: {{ error }}</p>
+  {% endif %}
 
   <div class="table-wrap">
     {% if students %}

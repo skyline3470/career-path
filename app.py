@@ -19,7 +19,7 @@ except ImportError:
 
 app = Flask(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
-SQLITE_DB = os.getenv("SQLITE_DB_PATH", "database.db")
+SQLITE_DB = os.getenv("SQLITE_DB_PATH", "/tmp/database.db" if os.getenv("VERCEL") else "database.db")
 USE_POSTGRES = DATABASE_URL.startswith(("postgresql://", "postgres://"))
 DB_INITIALIZED = False
 
@@ -141,10 +141,6 @@ QUIZ_MAP = {
 
 # ---- Routes ----
 
-@app.before_request
-def setup_database():
-    ensure_db_initialized()
-
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -174,34 +170,46 @@ def quiz():
 @app.route("/form", methods=["GET", "POST"])
 def form():
     success = False
+    error = None
     if request.method == "POST":
         name   = request.form.get("name", "").strip()
         email  = request.form.get("email", "").strip()
         career = request.form.get("career", "").strip()
         if name and email and career:
-            conn = get_connection()
-            insert_sql = (
-                "INSERT INTO students (name, email, career) VALUES (%s, %s, %s)"
-                if USE_POSTGRES
-                else "INSERT INTO students (name, email, career) VALUES (?, ?, ?)"
-            )
-            conn.execute(insert_sql, (name, email, career))
-            conn.commit()
-            conn.close()
-            success = True
-    return render_template("form.html", careers=CAREERS, success=success)
+            try:
+                ensure_db_initialized()
+                conn = get_connection()
+                insert_sql = (
+                    "INSERT INTO students (name, email, career) VALUES (%s, %s, %s)"
+                    if USE_POSTGRES
+                    else "INSERT INTO students (name, email, career) VALUES (?, ?, ?)"
+                )
+                conn.execute(insert_sql, (name, email, career))
+                conn.commit()
+                conn.close()
+                success = True
+            except Exception as exc:
+                error = str(exc)
+    return render_template("form.html", careers=CAREERS, success=success, error=error)
 
 @app.route("/admin")
 def admin():
-    conn = get_connection()
-    rows = conn.execute("SELECT id, name, email, career FROM students ORDER BY id DESC").fetchall()
-    conn.close()
-    return render_template("admin.html", students=rows)
+    rows = []
+    error = None
+    try:
+        ensure_db_initialized()
+        conn = get_connection()
+        rows = conn.execute("SELECT id, name, email, career FROM students ORDER BY id DESC").fetchall()
+        conn.close()
+    except Exception as exc:
+        error = str(exc)
+    return render_template("admin.html", students=rows, error=error)
 
 @app.route("/health")
 def health():
     database = "postgresql" if USE_POSTGRES else "sqlite"
     try:
+        ensure_db_initialized()
         conn = get_connection()
         row = conn.execute("SELECT 1").fetchone()
         conn.close()

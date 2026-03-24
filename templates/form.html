@@ -11,6 +11,11 @@
     {% if success %}
     <div class="success-msg">✅ Saved successfully! Check the Admin page to see your entry.</div>
     {% endif %}
+    {% if error %}
+    <div class="success-msg" style="background:#fff1f1;color:#8a1c1c;border:1px solid #f0b7b7">
+      Database error: {{ error }}
+    </div>
+    {% endif %}
 
     <form method="POST">
       <div class="form-group">
