@@ -21,6 +21,7 @@ app = Flask(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 SQLITE_DB = os.getenv("SQLITE_DB_PATH", "/tmp/database.db" if os.getenv("VERCEL") else "database.db")
 USE_POSTGRES = DATABASE_URL.startswith(("postgresql://", "postgres://"))
+IS_VERCEL = bool(os.getenv("VERCEL"))
 DB_INITIALIZED = False
 
 
@@ -66,6 +67,17 @@ def ensure_db_initialized():
         return
     init_db()
     DB_INITIALIZED = True
+
+
+def get_storage_warning():
+    """Explain when the current storage mode is not persistent."""
+    if IS_VERCEL and not USE_POSTGRES:
+        return (
+            "This deployment is using temporary SQLite storage on Vercel. "
+            "Submissions may not appear on later requests. Set DATABASE_URL "
+            "to your Neon/PostgreSQL database in Vercel to persist entries."
+        )
+    return None
 
 # Career data — easy to extend
 CAREERS = {
@@ -171,6 +183,7 @@ def quiz():
 def form():
     success = False
     error = None
+    warning = get_storage_warning()
     if request.method == "POST":
         name   = request.form.get("name", "").strip()
         email  = request.form.get("email", "").strip()
@@ -190,12 +203,19 @@ def form():
                 success = True
             except Exception as exc:
                 error = str(exc)
-    return render_template("form.html", careers=CAREERS, success=success, error=error)
+    return render_template(
+        "form.html",
+        careers=CAREERS,
+        success=success,
+        error=error,
+        warning=warning,
+    )
 
 @app.route("/admin")
 def admin():
     rows = []
     error = None
+    warning = get_storage_warning()
     try:
         ensure_db_initialized()
         conn = get_connection()
@@ -203,11 +223,12 @@ def admin():
         conn.close()
     except Exception as exc:
         error = str(exc)
-    return render_template("admin.html", students=rows, error=error)
+    return render_template("admin.html", students=rows, error=error, warning=warning)
 
 @app.route("/health")
 def health():
     database = "postgresql" if USE_POSTGRES else "sqlite"
+    warning = get_storage_warning()
     try:
         ensure_db_initialized()
         conn = get_connection()
@@ -217,6 +238,7 @@ def health():
             "status": "ok",
             "database": database,
             "database_ok": bool(row and row[0] == 1),
+            "warning": warning,
         }), 200
     except Exception as exc:
         return jsonify({
@@ -224,6 +246,7 @@ def health():
             "database": database,
             "database_ok": False,
             "message": str(exc),
+            "warning": warning,
         }), 500
 
 # ---- Start ----

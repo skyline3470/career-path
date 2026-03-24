@@ -8,6 +8,11 @@
   <p style="color:var(--muted);margin-top:.5rem">Fill in the form below — we'll store your preference.</p>
 
   <div class="form-box">
+    {% if warning %}
+    <div class="success-msg" style="background:#fff7e8;color:#8a5a00;border:1px solid #f3d28d">
+      {{ warning }}
+    </div>
+    {% endif %}
     {% if success %}
     <div class="success-msg">✅ Saved successfully! Check the Admin page to see your entry.</div>
     {% endif %}
